@@ -90,8 +90,12 @@ RCT_EXPORT_MODULE()
 
 RCT_EXPORT_METHOD(startWithDsnString:(NSString * _Nonnull)dsnString)
 {
-    [SentryClient setShared:[[SentryClient alloc] initWithDsnString:dsnString]];
-    [[SentryClient shared] startCrashHandler];
+    SentryClient *client = [[SentryClient alloc] initWithDsnString:dsnString];
+    SentryUserFeedbackViewModel *model = [SentryUserFeedbackViewModel new];
+    [client enableUserFeedbackAfterFatalEventWithUserFeedbackViewModel:model];
+    [client setDelegate:[[UIApplication sharedApplication] delegate]];
+    [SentryClient setShared:client];
+    [client startCrashHandler];
 }
 
 RCT_EXPORT_METHOD(activateStacktraceMerging:(RCTPromiseResolveBlock)resolve
